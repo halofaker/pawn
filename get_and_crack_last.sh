@@ -6,6 +6,6 @@
 # Warning, ordering is based on timestamp. It has to be assured that after reboot the date isn't 
 # set to something earlier.
 sqlite3 -line Responder/Responder.db "select * from responder ORDER BY 1 DESC LIMIT 1"  | grep fullhash | cut -d" " -f4 > /tmp/last.hash
-/home/pi/john/john /tmp/last.hash
+/home/pi/P4wnP1/john/john /tmp/last.hash
 echo $?
-/home/pi/john/john --show /tmp/last.hash
+/home/pi/P4wnP1/john/john --show /tmp/last.hash
