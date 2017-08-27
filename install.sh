@@ -35,9 +35,9 @@ wdir=$( cd $(dirname $BASH_SOURCE[0]) && pwd)
 # check for wifi capability
 if $wdir/wifi/check_wifi.sh; then WIFI=true; else WIFI=false; fi
 
-# check Internet conectivity against 
+# check Internet conectivity against
 echo "Testing Internet connection and name resolution..."
-if [ "$(curl -s http://www.msftncsi.com/ncsi.txt)" != "Microsoft NCSI" ]; then 
+if [ "$(curl -s http://www.msftncsi.com/ncsi.txt)" != "Microsoft NCSI" ]; then
         echo "...[Error] No Internet connection or name resolution doesn't work! Exiting..."
         exit
 fi
@@ -45,7 +45,7 @@ echo "...[pass] Internet connection works"
 
 # check for Raspbian Jessie
 echo "Testing if the system runs Raspbian Jessie..."
-if ! grep -q -E "Raspbian.*jessie" /etc/os-release ; then 
+if ! grep -q -E "Raspbian.*jessie" /etc/os-release ; then
         echo "...[Error] Pi is not running Raspbian Jessie! Exiting ..."
         exit
 fi
@@ -58,16 +58,16 @@ echo "Installing needed packages..."
 sudo apt-get update
 if $WIFI; then
 # install dhcpd, git, screen, pip
-	sudo apt-get install -y dnsmasq git python-pip python-dev screen sqlite3 inotify-tools hostapd
+	sudo apt-get install -y dnsmasq git python-pip python-dev screen sqlite3 rpi-update inotify-tools hostapd
 else
-	sudo apt-get install -y dnsmasq git python-pip python-dev screen sqlite3 inotify-tools
+	sudo apt-get install -y dnsmasq git python-pip python-dev screen sqlite3 rpi-update inotify-tools
 fi
 
 # not needed in production setup
 #sudo apt-get install -y tshark tcpdump
 
 # at this point the nameserver in /etc/resolv.conf is set to 127.0.0.1, so we replace it with 8.8.8.8
-#	Note: 
+#	Note:
 #	A better way would be to backup before dnsmasq install, with
 #		$ sudo bash -c "cat /etc/resolv.conf > /tmp/backup"
 #	and restore here with
@@ -179,7 +179,7 @@ fi
 echo "Enable autologin for user pi..."
 sudo ln -fs /etc/systemd/system/autologin@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
 
-# setup USB gadget capable overlay FS (needs Pi Zero, but shouldn't be checked - setup must 
+# setup USB gadget capable overlay FS (needs Pi Zero, but shouldn't be checked - setup must
 # be possible from other Pi to ease up Internet connection)
 echo "Enable overlay filesystem for USB gadgedt suport..."
 sudo sed -n -i -e '/^dtoverlay=/!p' -e '$adtoverlay=dwc2' /boot/config.txt
@@ -198,7 +198,7 @@ sudo rpi-update
 echo "===================================================================================="
 echo "If you came till here without errors, you shoud be good to go with your P4wnP1..."
 echo "...if not - sorry, you're on your own, as this is work in progress"
-echo 
+echo
 echo "Attach P4wnP1 to a host and you should be able to SSH in with pi@172.16.0.1 (via RNDIS/CDC ECM)"
 echo
 echo "If you use a USB OTG adapter to attach a keyboard, P4wnP1 boots into interactive mode"
@@ -210,7 +210,7 @@ echo "          SSH access:    pi@172.24.0.1 (password: raspberry)"
 echo
 echo "Go to your installation directory. From there you can alter the settings in the file 'setup.cfg',"
 echo "like payload and language selection"
-echo 
+echo
 echo "If you're using a Pi Zero W, give the HID backdoor a try ;-)"
 echo
 echo "You need to reboot the Pi now!"
