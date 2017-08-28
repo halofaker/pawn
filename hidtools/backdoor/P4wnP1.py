@@ -568,6 +568,9 @@ Use "help FireStage1" to get more details.
 		
 		self.killCLient()
 
+        def do_clear(self, line):
+                os.system('clear')
+
 	def do_CreateProc(self, line):
 		'''
 		This remote Powershell method calls "core_create_proc" in order to create a remote process
