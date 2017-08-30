@@ -195,6 +195,25 @@ sudo sed -i -e 's/modules-load=.*dwc2[',''_'a-zA-Z]*//' /boot/cmdline.txt
 echo "Installing kernel update, which hopefully makes USB gadgets work again"
 sudo rpi-update
 
+clear
+echo "P4wnP1 allows for a hidden SSID. Do you want to hide?"
+echo "WARNING: This can only be undone once connected to the pi, so be careful if you change your SSID"
+echo "Yes/No"
+menu_wifi () {
+configuration_file="/home/pi/P4wnP1/boot/init_wifi.sh"
+read n
+case $n in
+	yes) SSID_STATE="1"
+		sudo sed -i "s/\(ignore_broadcast_ssid *= *\).*/\1$SSID_STATE/" $configuration_file;;
+	no) SSID_STATE="0"
+		sudo sed -i "s/\(ignore_broadcast_ssid *= *\).*/\1$SSID_STATE/" $configuration_file;;
+	*) echo "Please type 'yes' or 'no'"
+		menu_wifi;;
+esac
+}
+menu_wifi
+clear
+
 echo "===================================================================================="
 echo "If you came till here without errors, you shoud be good to go with your P4wnP1..."
 echo "...if not - sorry, you're on your own, as this is work in progress"
