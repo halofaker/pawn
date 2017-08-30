@@ -197,8 +197,12 @@ sudo rpi-update
 
 clear
 echo "P4wnP1 allows for a hidden SSID. Do you want to hide?"
-echo "WARNING: This can only be undone once connected to the pi, so be careful if you change your SSID"
-echo "Yes/No"
+echo 
+echo "		This can only be undone once connected to the pi."
+echo -e "\e[4;91mWARNING:	\e[0mBe careful if you change your SSID."
+echo "		(You can always change this setting afterwards)"
+echo #-e "\e[0m"
+echo "[Yes/No]"
 menu_wifi () {
 configuration_file="/home/pi/P4wnP1/boot/init_wifi.sh"
 read n
@@ -212,7 +216,6 @@ case $n in
 esac
 }
 menu_wifi
-clear
 
 echo "===================================================================================="
 echo "If you came till here without errors, you shoud be good to go with your P4wnP1..."
