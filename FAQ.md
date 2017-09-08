@@ -15,7 +15,7 @@ Here's a little tutorial video, showing the steps on Windows 10. Requirement: `n
 [video link](https://youtu.be/QEWaIoal5qU)
 
 #### Method 2
-Edit the variables that start with "WIFI_ClIENT" to match the credentials with an existing accesspoint with ethernet connectivity and set WIFI_CLIENT to true.
+Edit the variables that start with "WIFI_CLIENT" to match the credentials with an existing accesspoint with ethernet connectivity and set WIFI_CLIENT to true.
 P4wnP1 will connect to this accesspoint instead of starting one.
 
 ### Does this run on other ARM devices?
