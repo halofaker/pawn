@@ -147,6 +147,8 @@ start_autossh # start_autossh takes care of checking AUTOSSH_ENABLED
 if $USE_HID; then
 	# import keyboard functions
 	source $wdir/boot/init_hid_keyboard.sh
+	# allows manuals duckyscript/ascii input as asked in issue #83
+	grep -v  "#" $wdir/boot/init_hid_keyboard.sh >> /tmp/profile.sh
 
 	# if HID keyboard should be tested for readyness, do it (triggers "onKeyboardUp" callback of payload)
 	if $HID_KEYBOARD_TEST; then
