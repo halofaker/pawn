@@ -97,15 +97,14 @@ fi
 
 # change hostname to make P4wnP1 resolveable on "name.local"
 if $WIFI || $USB_ETHERNET; then
-	if [[ -z $HOSTNAME ]];then
-		$HOSTNAME="MAME82-P4WNP1"
-	fi
-	hostname $HOSTNAME
-	echo $HOSTNAME > /etc/hostname
+	hostname="MAME82-P4WNP1"
+
+	hostname $hostname
+	echo $hostname > /etc/hostname
 
 	# add to /etc/hosts
-	if ! grep -q -E "^127\.0\.0\.1 $HOSTNAME\$" /etc/hosts; then
-	        echo "127.0.0.1 $HOSTNAME" >> /etc/hosts
+	if ! grep -q -E "^127\.0\.0\.1 $hostname\$" /etc/hosts; then
+	        echo "127.0.0.1 $hostname" >> /etc/hosts
 	fi
 fi
 
