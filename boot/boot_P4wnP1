@@ -158,10 +158,11 @@ if $USE_HID; then
                 function outhid_interactive()
                 {
 			echo "raw ascii injection; use \\0 to exit"
-                        while read -r -p "raw> " line;do
+                        while read -e -r -p "raw> " line;do
                                 if [ "\$line" == "\\0" ];then
                                         break;
                                 else
+                                        history -s \$line
                                         echo "\$line" |  python $wdir/duckencoder/duckencoder.py -l $lang -r | sudo python $wdir/hidtools/transhid.py
                                 fi;
                         done
@@ -176,10 +177,11 @@ if $USE_HID; then
                 function duckhid_interactive()
                 {
 			echo "interactive duckyscript; use 'exit' to exit"
-                        while read -r -p "duck> " line;do
+                        while read -e -r -p "duck> " line;do
                                 if [ "\$line" == "exit" ];then
                                         break;
                                 else
+					history -s \$line
                                         echo "\$line" |  python $wdir/duckencoder/duckencoder.py -l $lang -p | sudo python $wdir/hidtools/transhid.py
                                 fi;
                         done
