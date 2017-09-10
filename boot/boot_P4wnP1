@@ -152,7 +152,7 @@ if $USE_HID; then
 		function outhid_multi()
                 {
                         echo "input raw text and press ctrl-d to send"
-                        cat |  python $wdir/duckencoder/duckencoder.py -l $lang -p | sudo python $wdir/hidtools/transhid.py
+                        cat |  python $wdir/duckencoder/duckencoder.py -l $lang -r | sudo python $wdir/hidtools/transhid.py
                 }
 
                 function outhid_interactive()
