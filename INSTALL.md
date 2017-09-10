@@ -1,8 +1,10 @@
 # P4wnP1 Install Guide
 
-## Step 1 - Install Raspbian Jessie Lite
-
- 1. Download the image from [here](https://www.raspberrypi.org/downloads/raspbian/)
+## Step 1 - Install Raspbian Lite
+ 1.  Download: 
+ [Jessie Lite image](http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2017-07-05/) 
+ or
+ [Stretch Lite image](https://www.raspberrypi.org/downloads/raspbian/) (recomended)
  2. Follow the guide [here](https://www.raspberrypi.org/documentation/installation/installing-images/README.md)
 
 ## Step 2 - Connect the Pi (Zero) to Internet
@@ -16,7 +18,7 @@ Several methods are existing to do this
 
 A guide on how to do method 3 could be found [here](http://www.circuitbasics.com/raspberry-pi-zero-ethernet-gadget/). Two things should be noted on method 3:
 
-1. Most Raspberry Pi Zero USB gadget configurations interfere with the configuration of P4wnP1 (which for example doesn't use "g_ether"). The setup script of P4wnP1 tries to fix interfering configurations. If you encouter problems, please try another method to connect to Internet and revert the changes done to the bare RASPBIAN JESSIE image.
+1. Most Raspberry Pi Zero USB gadget configurations interfere with the configuration of P4wnP1 (which for example doesn't use "g_ether"). The setup script of P4wnP1 tries to fix interfering configurations. If you encouter problems, please try another method to connect to Internet and revert the changes done to the bare RASPBIAN JESSIE/STRETCH image.
 2. Unlike described in most tutorials (including the linked one), the SSH server on current Raspbian isn't running by default. You have to boot up the Pi into interactive mode and run `sudo update-rc.d ssh enable` (avoid manual changes to `/etc/rc2.d/`, most times this messes things up).
  
 ## Getting headless Pi Zero Online (my way, needs a micro USB cable + SD card reader + KALI Linux)
@@ -37,7 +39,10 @@ Now that the Pi isn't able too receive a DHCP lease, it chooses its own IP with 
 8. Watch the tshark output, till you see an ARP request with an IP (who has 169.254.241.194 in my case)
 9. Stop tshark with `CTRL + C` and grab a copy of the IP.
 10. Configure your `usb0` interface to reside in the same subnet, I choose `169.254.241.1` and thus run the following command:
-`ifconfig usb0 169.254.241.1`
+`ifconfig usb0 169.254.241.1`.
+
+Important: If the interface `usb0` isn't configured to manual setup, it is likely that a DHCP client is running. Trying to retreive a DHCP lease would wipe the IP configuration done in step 10 (ending up with Internet connection loss at some later point). The quick and dirty way to circumvent this on Kali, is to stop the network manager service with `service network-manager stop`
+
 11. test if you could reach out to the Pi with `ping 169.254.241.194`
 12. If everything goes fine, you should now be able to login with `ssh pi@169.254.241.194`
 
