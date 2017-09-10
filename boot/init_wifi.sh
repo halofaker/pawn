@@ -1,4 +1,24 @@
 #!/bin/sh
+
+
+#    This file is part of P4wnP1.
+#
+#    Copyright (c) 2017, Marcus Mengs. 
+#
+#    P4wnP1 is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    P4wnP1 is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with P4wnP1.  If not, see <http://www.gnu.org/licenses/>.
+
+
 #
 # provides WiFi functionality for Pi Zero W (equipped with WiFI module)
 
@@ -7,6 +27,11 @@ function check_wifi()
 {
 	if $wdir/wifi/check_wifi.sh; then WIFI=true; else WIFI=false; fi
 }
+
+##########################
+# WiFi AP functions
+##########################
+
 
 function generate_dnsmasq_wifi_conf()
 {
@@ -31,7 +56,6 @@ function generate_dnsmasq_wifi_conf()
 		dhcp-authoritative
 		log-dhcp
 EOF
-
 }
 
 function generate_hostapd_conf()
@@ -66,10 +90,23 @@ function generate_hostapd_conf()
 
 		# Use WPA authentication
 		auth_algs=1
+EOF
 
+	if $WIFI_ACCESSPOINT_HIDE_SSID; then
+	cat <<- EOF >> /tmp/hostapd.conf
+		# Require clients to know the network name
+		ignore_broadcast_ssid=2
+
+EOF
+	else
+	cat <<- EOF >> /tmp/hostapd.conf
 		# Require clients to know the network name
 		ignore_broadcast_ssid=0
 
+EOF
+	fi
+
+	cat <<- EOF >> /tmp/hostapd.conf
 		# Use WPA2
 		wpa=2
 
@@ -97,4 +134,98 @@ function start_wifi_accesspoint()
 	# start DHCP server (second instance if USB over Etherne is in use)
 	generate_dnsmasq_wifi_conf
 	dnsmasq -C /tmp/dnsmasq_wifi.conf
+}
+
+
+##########################
+# WiFi client functions
+##########################
+function generate_wpa_entry()
+{
+
+	#wpa_passphrase $1 $2 | grep -v -e "#psk"
+	# output result only if valid password was used (8..63 characters)
+	res=$(wpa_passphrase $1 $2) && echo "$res" | grep -v -e "#psk"
+}
+
+function scan_for_essid()
+{
+	# scan for given ESSID, needs root privs (sudo appended to allow running from user pi if needed)
+	scanres=$(sudo iwlist wlan0 scan essid "$1")
+
+	if (echo "$scanres" | grep -q -e "$1\""); then # added '"' to the end to avoid partial match
+		#network found
+
+		# check for WPA2
+		if (echo "$scanres" | grep -q -e "IE: IEEE 802.11i/WPA2 Version 1"); then
+			# check for PSK CCMP
+			if (echo "$scanres" | grep -q -e "CCMP" && echo "$scanres" | grep -q -e "PSK"); then
+				echo "WPA2_PSK" # confirm WPA2 usage
+			else
+				echo "WPA2 no CCMP PSK"
+			fi
+		fi
+
+	else
+		echo "Network $1 not found"
+	fi
+}
+
+function generate_wpa_supplicant_conf()
+{
+	# generates temporary configuration (sudo prepended to allow running from user pi if needed)
+	sudo bash -c "cat /etc/wpa_supplicant/wpa_supplicant.conf > /tmp/wpa_supplicant.conf"
+
+	# ToDo: check if configured WiFi ESSID already exists, 
+	# if
+	#	WIFI_CLIENT_STORE_NETWORK == true
+	#	WIFI_CLIENT_OVERWRITE_PSK == true
+	# delete the network entry, to overwrite in the next step
+	#
+	# if
+	#	WIFI_CLIENT_STORE_NETWORK == false
+	# delete the network entry, to overwrite the old entry in next step (but don't store it later on)
+
+	generate_wpa_entry $1 $2 > /tmp/current_wpa.conf
+	sudo bash -c 'cat /tmp/current_wpa.conf >> /tmp/wpa_supplicant.conf'
+
+	# ToDo: store the new network back to persistent config 
+	# if
+	#	WIFI_CLIENT_STORE_NETWORK == true
+	# cat /tmp/wpa_supplicant.conf > /etc/wpa_supplicant/wpa_supplicant.conf # store config change
+}
+
+function start_wpa_supplicant()
+{
+	# sudo is unneeded, but prepended in case this should be run without root
+
+	# start wpa supplicant as deamon with current config
+	sudo wpa_supplicant -B -i wlan0 -c /tmp/wpa_supplicant.conf
+
+	# start DHCP client on WiFi interface (daemon, IPv4 only)
+	sudo dhclient -4 -nw -lf /tmp/dhclient.leases wlan0
+}
+
+function start_wifi_client()
+{
+
+	sudo ifconfig wlan0 up
+
+	if $WIFI_CLIENT; then
+		echo "Try to find WiFi $WIFI_CLIENT_SSID"
+		res=$(scan_for_essid $WIFI_CLIENT_SSID)
+		if [ "$res" == "WPA2_PSK" ]; then
+			echo "Network $WIFI_CLIENT_SSID found"
+			echo "... creating config"
+			generate_wpa_supplicant_conf "$WIFI_CLIENT_SSID" "$WIFI_CLIENT_PSK"
+			echo "... connecting ..."
+			start_wpa_supplicant
+			return 0
+		else
+			echo "Network $WIFI_CLIENT_SSID not found"
+			return 1 # indicate error
+		fi
+	else
+		return 1 # indicate error
+	fi
 }

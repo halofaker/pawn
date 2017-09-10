@@ -1,32 +1,30 @@
 #!/bin/bash
+
+#    This file is part of P4wnP1.
 #
-# P4wnP1 (PiZero IPv4 traffic interceptor and USB hash stealer)
-# setup script
+#    Copyright (c) 2017, Marcus Mengs. 
+#
+#    P4wnP1 is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    P4wnP1 is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with P4wnP1.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# P4wnP1 install script.
 #       Author: Marcus Mengs (MaMe82)
 #
 # Notes:
-#       - install.sh should only be run ONCE
-#       - work in progress (contains possible errors and typos)
+#   - install.sh should only be run ONCE
+#   - work in progress (contains possible errors and typos)
 #	- the script needs an Internet connection to install the required packages
-#	- if /home/pi/.profile is patched correctly, responder output is shown via HDMI while connected to target
-#
-# ToDo
-# - [done] enable autologin
-# - [done, not tested] setup correct overlay FS (set "dwoverlay=dwc2" in /boot/config.txt")
-# - [done, not tested] add "libcomposite" to /etc/modules
-# - [done] create entries in /etc/network/interfaces to exclude RNDIS/ECM from automatic configuration
-# - [nothing to do right now] do not: create init.d service to setup USB gadgets on boot, us .profile instead
-# - [done, untested] patch /home/pi/.profile to contain "sudo /home/pi/startup_p4wnp1.sh" as the script is meant to be runned
-#   in interactive mode. This is needed to be able to abort the "Link detection mode". In order to have
-#   the script running at startup autologin has to be enabled for the user pi!
-# - [done] set DNS entry in /etc/resolv.conf in order to connect to Internet via target host if needed
-#	Putting a nameserver into /etc/resolv.conf is neeeded during setup, as it got reset to 127.0.0.1 during
-#	apt-get install... (may be caused by dnsmasq package)
-# - [done] implement checks to see of all requirements are met (raspbian jessie, auto logon, packages ...)
-# - [open] revert changes in case something fails (could be used to uninstall)
-# - [done] check if /boot/cmdline.txt has been changed to load USB gadget modules (modules-load=dwc2,g_ether) and undo this additions
-# - download and extract of JtR jumbo has to be added (https://github.com/mame82/john-1-8-0-jumbo_raspbian_jessie_precompiled)
-#	--> used by get_and_crack_last.sh
 
 
 # get DIR the script is running from (by CD'ing in and running pwd
@@ -45,23 +43,26 @@ echo "...[pass] Internet connection works"
 
 # check for Raspbian Jessie
 echo "Testing if the system runs Raspbian Jessie..."
-if ! grep -q -E "Raspbian.*jessie" /etc/os-release ; then 
-        echo "...[Error] Pi is not running Raspbian Jessie! Exiting ..."
+if ! (grep -q -E "Raspbian.*jessie" /etc/os-release || grep -q -E "Raspbian.*stretch" /etc/os-release) ; then
+        echo "...[Error] Pi is not running Raspbian Jessie or Stretch! Exiting ..."
         exit
 fi
-echo "...[pass] Pi seems to be running Raspbian Jessie"
+echo "...[pass] Pi seems to be running Raspbian Jessie or Stretch"
 
 echo "Backing up resolv.conf"
 sudo cp /etc/resolv.conf /tmp/resolv.conf
 
 echo "Installing needed packages..."
 sudo apt-get update
-if $WIFI; then
-# install dhcpd, git, screen, pip
-	sudo apt-get install -y dnsmasq git python-pip python-dev screen sqlite3 inotify-tools hostapd
-else
-	sudo apt-get install -y dnsmasq git python-pip python-dev screen sqlite3 inotify-tools
-fi
+#if $WIFI; then
+#	sudo apt-get install -y dnsmasq git python-pip python-dev screen sqlite3 inotify-tools hostapd
+#else
+#	sudo apt-get install -y dnsmasq git python-pip python-dev screen sqlite3 inotify-tools
+#fi
+
+# hostapd gets installed in even if WiFi isn't present (SD card could be moved from "Pi Zero" to "Pi Zero W" later on)
+sudo apt-get install -y dnsmasq git python-pip python-dev screen sqlite3 inotify-tools hostapd autossh
+
 
 # not needed in production setup
 #sudo apt-get install -y tshark tcpdump
@@ -78,8 +79,13 @@ sudo bash -c "echo nameserver 8.8.8.8 >> /etc/resolv.conf"
 
 # install pycrypto
 echo "Installing needed python additions..."
-sudo pip install pycrypto
+# Fix: issue of conflicting filename 'setup.cfg' with paython setuptools
+# Reported by  PoSHMagiC0de
+# https://github.com/mame82/P4wnP1/issues/52#issuecomment-325236711
+mv setup.cfg setup.bkp
+sudo pip install pycrypto # already present on stretch
 sudo pip install pydispatcher
+mv setup.bkp setup.cfg
 
 # Installing Responder isn't needed anymore as it is packed into the Repo as submodule
 #echo "Installing Responder (patched MaMe82 branch with Internet connection emulation and wpad additions)..."
@@ -88,7 +94,7 @@ sudo pip install pydispatcher
 
 # disable interfering services
 echo "Disabeling unneeded services to shorten boot time ..."
-sudo update-rc.d ntp disable
+sudo update-rc.d ntp disable # not needed for stretch (only jessie)
 sudo update-rc.d avahi-daemon disable
 sudo update-rc.d dhcpcd disable
 sudo update-rc.d networking disable
@@ -193,8 +199,27 @@ echo "Removing all former modules enabled in /boot/cmdline.txt..."
 sudo sed -i -e 's/modules-load=.*dwc2[',''_'a-zA-Z]*//' /boot/cmdline.txt
 
 echo "Installing kernel update, which hopefully makes USB gadgets work again"
+# still needed on current stretch releas, kernel 4.9.41+ ships still
+# with broken HID gadget module (installing still needs a cup of coffee)
+# Note:  last working Jessie version was the one with kernel 4.4.50+
+#        stretch kernel known working is 4.9.45+ (only available via update right now)
 sudo rpi-update
 
+echo "Generating keypair for use with AutoSSH..."
+source $wdir/setup.cfg
+ssh-keygen -q -N "" -C "P4wnP1" -f $AUTOSSH_PRIVATE_KEY && SUCCESS=true
+if $SUCCESS; then
+        echo "... keys created"
+        echo
+        echo "Use \"$wdir/ssh/pushkey.sh\""
+        echo "in order to promote the public key to a remote SSH server"
+else
+	echo "Creation of SSH key pair failed!"
+fi
+
+
+echo
+echo
 echo "===================================================================================="
 echo "If you came till here without errors, you shoud be good to go with your P4wnP1..."
 echo "...if not - sorry, you're on your own, as this is work in progress"

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 #    This file is part of P4wnP1.
 #
 #    Copyright (c) 2017, Marcus Mengs. 
@@ -19,12 +18,15 @@
 #    along with P4wnP1.  If not, see <http://www.gnu.org/licenses/>.
 
 
-ledtrigger="/tmp/blink_count"
-# led blink function
-function led_blink()
+# Enable AutoSSH reachback connection according to the settings of setup.cfg or current payload
+
+function start_autossh()
 {
-	if [ "$1" ] 
-	then
-		echo "$1" > $ledtrigger
+	if $AUTOSSH_ENABLED; then
+		echo "Forwarding P4wnP1 SSH server to \"$AUTOSSH_REMOTE_HOST\" ..."
+		echo "    P4wnP1 SSH will be reachable on localhost:$AUTOSSH_REMOTE_PORT on this server"
+		cp $AUTOSSH_PRIVATE_KEY /tmp/ssh_id
+
+		sudo autossh -M 0 -f -T -N  -o "ServerAliveInterval 30" -o "ServerAliveCountMax 3" -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -i /tmp/ssh_id -R localhost:$AUTOSSH_REMOTE_PORT:localhost:22 $AUTOSSH_REMOTE_USER@$AUTOSSH_REMOTE_HOST
 	fi
 }
