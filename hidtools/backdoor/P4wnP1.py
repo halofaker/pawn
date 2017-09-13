@@ -680,7 +680,7 @@ Use "help FireStage1" to get more details.
 	  Is faster, because less keys have to be printed out. As the
 	  PowerShell script isn't capable of reading serial and 
 	  manufacturer of a USB HID composite device, PID  and VID have 
-	  to be perpended in front of the payload. This leaves a larger 
+	  to be prepended in front of the payload. This leaves a larger 
 	  footprint.
 	  
 	trigger_type = 2:
