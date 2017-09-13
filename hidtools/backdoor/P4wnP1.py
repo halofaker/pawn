@@ -606,6 +606,12 @@ Use "help FireStage1" to get more details.
 		self.killCLient()
 
         def do_clear(self, line):
+		'''
+================================================================================
+usage: clear
+
+Clears the terminal screen
+		'''
                 os.system('clear')
 
 	def do_CreateProc(self, line):
