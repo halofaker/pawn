@@ -635,6 +635,9 @@ Use "help FireStage1" to get more details.
 		self.client_call_get_proc_list(waitForResult = True)
 
 	def do_shell(self, line):
+		'''
+		Start a shell inside the target computer
+		'''
 		if not self.client.isConnected():
 			print "Not possible... Run 'FireStage1' first, to get the target connected"
 			return
@@ -827,6 +830,12 @@ Use "help FireStage1" to get more details.
 		print self.duckencoder.getLanguage()
 
 	def do_interact(self, line):
+		'''
+		Interact with processes on the target
+		Usage: Interact <process ID>
+
+		use GetClientProcs for target process IDs
+		'''
 		if not self.client.isConnected():
 			print "Not possible, client not connected"
 			return
@@ -851,11 +860,17 @@ Use "help FireStage1" to get more details.
 		self.interactWithClientProcess(pid)
 			
 	def do_exit(self, line):
+		'''
+		Exit the Backdoor payload to the pi's command-line
+		'''
 		print "Exitting..."
 		# self.ll.stop() # should happen in global finally statement
 		sys.exit()
 
 	def do_state(self, line):
+		'''
+		See details about the target computer
+		'''
 		self.client.print_state()
 	def do_echotest(self, line):
 		'''
@@ -866,6 +881,9 @@ Use "help FireStage1" to get more details.
 		self.client_call_echo(line)
 		
 	def do_SendDuckyScript(self, line):
+		'''
+		Deploys a pre-compiled Ducky script saved in P4wnP1/duckyscrips/
+		'''
 		scriptpath = self.config["PATH_DUCKYSCRIPT"] +  "/" +  line
 		
 		if not FileSystem.fileExists(scriptpath):
@@ -916,12 +934,21 @@ Use "help FireStage1" to get more details.
 		self.duckencoder.outhidDuckyScript(script)
 		
 	def do_lcd(self,  line):
+		'''
+		Change directory on the Pi
+		'''
 		print FileSystem.cd(line)
 		
 	def do_lpwd(self,  line):
+		'''
+		Print the name of the Pi's current directory
+		'''
 		print FileSystem.pwd()
 		
 	def do_lls(self,  line):
+		'''
+		Print the contents of the Pi's current directory
+		'''
 		if len(line.strip()) >  0:
 			res = FileSystem.ls_native2(line.split(" "))
 		else:
@@ -964,12 +991,21 @@ Use "help FireStage1" to get more details.
 
 	
 	def do_pwd(self, line):
+		'''
+		Print the target's current directory
+		'''
 		self.client_call_FS_command("pwd")
 		
 	def do_ls(self, line):
+		'''
+		List contents of the target's current directory
+		'''
 		self.client_call_FS_command("ls", line)
 		
 	def do_cd(self, line):
+		'''
+		Change the target's current directory
+		'''
 		self.client_call_FS_command("cd", line)			
 
 	@staticmethod
@@ -995,6 +1031,10 @@ Use "help FireStage1" to get more details.
 		
 	
 	def do_upload(self, line):
+		'''
+		Upload a file from the Pi to the target
+		Usage: upload <Pi/directory.filetype> <target/directory.filetype>
+		'''
 		args = line.split(" ")
 		target_path = ""
 		source_path = ""
@@ -1114,6 +1154,10 @@ Use "help FireStage1" to get more details.
 		print
 		
 	def do_download(self, line):
+		'''
+		Download a file from the Pi to the target
+		Usage: download <target/directory.filetype> <Pi/directory.filetype>
+		'''
 		args = line.split(" ")
 		target_path = ""
 		source_path = ""
