@@ -146,6 +146,47 @@ start_autossh # start_autossh takes care of checking AUTOSSH_ENABLED
 if $USE_HID; then
 	# import keyboard functions
 	source $wdir/boot/init_hid_keyboard.sh
+	# allows manuals duckyscript/ascii input as asked in issue #83
+	cat <<-EOF >> /tmp/profile.sh
+                # output raw ASCII to HID keyboard
+		function outhid_multi()
+                {
+                        echo "input raw text and press ctrl-d to send"
+                        cat |  python $wdir/duckencoder/duckencoder.py -l $lang -r | sudo python $wdir/hidtools/transhid.py
+                }
+
+                function outhid_interactive()
+                {
+			echo "raw ascii injection; use \\0 to exit"
+                        while read -e -r -p "raw> " line;do
+                                if [ "\$line" == "\\0" ];then
+                                        break;
+                                else
+                                        history -s \$line
+                                        echo "\$line" |  python $wdir/duckencoder/duckencoder.py -l $lang -r | sudo python $wdir/hidtools/transhid.py
+                                fi;
+                        done
+                }
+
+                # output DUCKY SCRIPT to HID keyboard
+		function duckhid_multi()
+		{
+			echo "input duckyscript and press ctrl-d to send"
+			cat |  python $wdir/duckencoder/duckencoder.py -l $lang -p | sudo python $wdir/hidtools/transhid.py
+		}
+                function duckhid_interactive()
+                {
+			echo "interactive duckyscript; use 'exit' to exit"
+                        while read -e -r -p "duck> " line;do
+                                if [ "\$line" == "exit" ];then
+                                        break;
+                                else
+					history -s \$line
+                                        echo "\$line" |  python $wdir/duckencoder/duckencoder.py -l $lang -p | sudo python $wdir/hidtools/transhid.py
+                                fi;
+                        done
+                }
+EOF
 
 	# if HID keyboard should be tested for readyness, do it (triggers "onKeyboardUp" callback of payload)
 	if $HID_KEYBOARD_TEST; then
