@@ -964,7 +964,7 @@ Communications happen through a pure HID covert channel.
 ================================================================================
 Usage: SendDuckyScript <script>
 
-Deploys a Ducky script saved in P4wnP1/duckyscrips/
+Deploys a Ducky script saved in P4wnP1/Duckyscrips/
 
 Language of P4wnP1 must match that of the target. For this, use:
 <GetKeyboardLanguage>
@@ -1020,6 +1020,14 @@ Language of P4wnP1 must match that of the target. For this, use:
 		self.duckencoder.outhidDuckyScript(script)
 
 	def do_SendMouseScript(self, line):
+		'''
+================================================================================
+Usage: SendMouseScript <script>
+
+Deploys a Mouse script saved in P4wnP1/Mousescrips/
+
+Similar to SendDuckyScript, except actuates the mouse rather than the keyboard.
+		'''
 		scriptpath = self.config["PATH_MOUSESCRIPT"] +  "/" +  line
 		
 		if not FileSystem.fileExists(scriptpath):
