@@ -3,7 +3,7 @@
 
 #    This file is part of P4wnP1.
 #
-#    Copyright (c) 2017, Marcus Mengs. 
+#    Copyright (c) 2017, Marcus Mengs.
 #
 #    P4wnP1 is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,14 +25,14 @@
 function outhid()
 {
 #	cat | python $wdir/duckencoder/duckencoder.py -l $lang -r | python $wdir/transhid.py > /dev/hidg0
-	cat | python $wdir/duckencoder/duckencoder.py -l $lang -r | python $wdir/hidtools/transhid.py 
+	cat | python $wdir/duckencoder/duckencoder.py -l $lang -r | python $wdir/hidtools/transhid.py
 }
 
 # output DUCKY SCRIPT to HID keyboard
 function duckhid()
 {
 #	cat | python $wdir/duckencoder/duckencoder.py -l $lang -p | python $wdir/transhid.py > /dev/hidg0
-	cat | python $wdir/duckencoder/duckencoder.py -l $lang -p | python $wdir/hidtools/transhid.py 
+	cat | python $wdir/duckencoder/duckencoder.py -l $lang -p | python $wdir/hidtools/transhid.py
 }
 
 # Blocks till NUMLOCK, CAPSLOCK or SCROLLLOCK has been hit 5 time on targets keyboard
@@ -41,6 +41,11 @@ function key_trigger()
 {
 	sudo python $wdir/hidtools/watchhidled.py trigger
 	return $?
+}
+
+function test_if_pressed() {
+	#assumes correct values since no checking is done. invokes WatchHIDLed.add_trigger and start_LED_monitoring
+	sudo python $wdir/hidtools/watchhidled.py trigger $1 ${2:-1} ${3:-1}
 }
 
 # reads LEDs from keyboard device till something is sent
