@@ -42,8 +42,19 @@ function key_trigger()
 	sudo python $wdir/hidtools/watchhidled.py trigger
 	return $?
 }
+function powershell_key_trigger()
+#no checking done. assumes correct use.
+{
+	cat << EOF | duckhid
+	 	GUI r
+		DELAY 500
+		STRING powershell -Command "\$wsh = New-Object -ComObject WScript.Shell; \$wsh.SendKeys('{$1}')"
+		ENTER
+	EOF
+}
 
-function test_if_pressed() {
+function wait_until_hid_led() {
+	#can be used for basic payload branching.
 	#assumes correct values since no checking is done. invokes WatchHIDLed.add_trigger and start_LED_monitoring
 	sudo python $wdir/hidtools/watchhidled.py trigger $1 ${2:-1} ${3:-1}
 }
