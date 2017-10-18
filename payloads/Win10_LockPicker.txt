@@ -132,7 +132,7 @@ function check_for_hash()
 function get_hash()
 {
 	# exclude hashes for "SMB\"
-	sqlite3 -line $wdir/Responder/Responder.db "select fullhash from responder where not user='SMB\'" | cut -d " " -f3
+	sqlite3 $wdir/Responder/Responder.db "select fullhash from responder where not user='SMB\' limit 1"
 }
 
 function kill_responder()
