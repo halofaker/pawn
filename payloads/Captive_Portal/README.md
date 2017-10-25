@@ -21,7 +21,7 @@ Setup
 1. Have P4wnP1 (i know, could never guess). Instructions here : https://github.com/mame82/P4wnP1
 2. Install apache2 and PHP. Paste the following into terminal : sudo apt-get install apache2 php7.0 libapache2-mod-php7.0 -y 
 3. Copy contents of 'Apache' folder of this repo into /var/www/html (replce the original index.html)
-4. Copy Captiveportal.txt to P4wnP1/payloads
+4. Copy the Captive_Portal folder to P4wnP1/payloads
 5. Add following line to setup.cfg : PAYLOAD=Captive_Portal/Captiveportal.txt
 6. Comment out all other payloads in setup.cfg
 7. Reboot P4wnP1
