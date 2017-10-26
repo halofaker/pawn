@@ -1,7 +1,8 @@
 This is a phishing payload for P4wnP1.
 Author : Brisk4t (https://github.com/Brisk4t)
-Credits : Sebastian Kinne - Sebkinne (https://github.com/sebkinne)
+Credits : Sebastian Kinne - Sebkinne :(https://github.com/sebkinne)
           Stackoverflow's Floby : https://stackoverflow.com/users/1946228/floby
+		  Ayu : https://codepen.io/Mongeed/pen/IuBLt
 
 P4wnP1 is made by Mame82 : https://github.com/mame82
 

