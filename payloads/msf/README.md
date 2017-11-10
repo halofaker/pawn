@@ -1,5 +1,8 @@
 metasploit-autopwn payload port from bash bunny for P4wnP1
 
+need pi0w and mobilephone oder laptop with wlan or bluetooth
+for the metasploit sessions.
+
 Author : hahnstep (https://github.com/hahnstep)
 
 Credits : 
