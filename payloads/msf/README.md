@@ -13,7 +13,7 @@ Bash Bunny payload by Mohamed A. Baset : https://github.com/hak5/bashbunny-paylo
 
 Setup : 
 
-install metasploit with msf_install.sh
+install metasploit with install_msf.sh
 
 add payload to setup.cfg
 
