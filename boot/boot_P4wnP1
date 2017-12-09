@@ -42,6 +42,9 @@ source $wdir/boot/init_led.sh
 echo "P4wnP1: Loading config ..."
 source $wdir/boot/init_config.sh
 
+echo "P4wnP1: HATs config ..."
+source $wdir/boot/init_hats.sh
+
 # Create bash script which could be altered from /home/pi/.profile
 touch /tmp/profile.sh
 echo "#!/bin/bash" >> /tmp/profile.sh

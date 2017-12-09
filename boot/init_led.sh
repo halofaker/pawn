@@ -42,6 +42,9 @@ function led_blink()
 	then
 		echo "$1" > $ledtrigger
 	fi
+
+	# if some HAT support leds
+        $wdir/HATs/ledtool.sh "$1"
 }
 
 # disable LED for now

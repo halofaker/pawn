@@ -49,7 +49,6 @@ WIFI_ACCESSPOINT_HIDE_SSID=false # don't hide ESSID
 
 BLUETOOTH_NAP=true # enable bluetooth NAP, P4wnP1 will be rechable via IP configured in setup.cfg (BLUETOOTH_NAP_IP)
 
-
 # The AutoSSH section enables a SSH reachback to a custom external SSH server
 # working like this:
 #   1) the target server is defined by AUTOSSH_REMOTE_HOST, the user by
