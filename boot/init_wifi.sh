@@ -254,6 +254,13 @@ function generate_wpa_supplicant_conf()
 	# delete the network entry, to overwrite the old entry in next step (but don't store it later on)
 
 	generate_wpa_entry $1 $2 > /tmp/current_wpa.conf
+
+	# fix for a bug that appears if i install a blank pi zero w headless 
+	# with ssh and wpa_supplicant.conf enabled. 
+	# after install P4wnP1 its not possible to use Wifi Access Point  
+        # adding a wifi client per payload or setup.cfg fails 
+        sudo bash -c 'echo "" >> /tmp/wpa_supplicant.conf'
+
 	sudo bash -c 'cat /tmp/current_wpa.conf >> /tmp/wpa_supplicant.conf'
 
 	# ToDo: store the new network back to persistent config 
