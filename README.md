@@ -352,6 +352,15 @@ Requirements
 -   Internet connection to run the `install.sh` script
 -   the project is still work in progress, so features and new payloads are added in frequently (make sure to have an updated copy of P4wnP1 repo)
 
+Recommended Case
+============
+
+### Video demo
+
+Stealth Raspberry Pi Zero / Pi Zero W USB Dongle by [N-O-D-E](https://github.com/N-O-D-E), available on his [shop](https://n-o-d-e.net/shop/) (includes the breakout board and wires, requires soldering) or 3D print and gather the components yourself, files can be found [here](https://github.com/N-O-D-E/Dongle/tree/master/version%203%20(non-sliding)).
+
+[![N-O-D-E stealth Pi Zero USB dongle](https://imgur.com/1lG6uxJl.png)](https://youtu.be/LHmSem3X_-s)
+
 Snagging creds from locked machines, vulnerable application (Oracle JAVA JRE/JDK vuln)
 ======================================================================================
 
