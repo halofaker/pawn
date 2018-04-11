@@ -253,7 +253,7 @@ class StreamChannel(Channel):
         self.__position = value
 
     @property
-    def ReadTimeout():
+    def ReadTimeout(self):
         return self.__read_timeout
     
     @ReadTimeout.setter
@@ -261,7 +261,7 @@ class StreamChannel(Channel):
         self.__read_timeout = value
         
     @property
-    def WriteTimeout():
+    def WriteTimeout(self):
         return self.__write_timeout
     
     @WriteTimeout.setter
