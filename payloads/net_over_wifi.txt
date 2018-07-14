@@ -1,0 +1,82 @@
+#    This file is part of P4wnP1.
+#
+#    Copyright (c) 2017, Marcus Mengs. 
+#
+#    P4wnP1 is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    P4wnP1 is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with P4wnP1.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+# P4wnP1 payload to send all internet trafic over WI-Fi.
+# ==========================
+
+# =============================
+# USB setup
+# =============================
+# Make sure to change USB_PID if you enable different USB functionality in order
+# to force Windows to enumerate the device again
+USB_VID="0x1d6b"        # Vendor ID
+USB_PID="0x0106"        # Product ID
+
+USE_ECM=true            # if true CDC ECM will be enabled (Ethernet over USB for Windows)
+USE_RNDIS=true          # if true RNDIS will be enabled (Ethernet over USB for macOS/Linux)
+USE_HID=false            # if true HID keyboard will be enabled (USB keyboard attacks)
+USE_UMS=false           # if true USB Mass Storage will be enabled
+USE_RAWHID=false         # if true HID raw device will be enabled (used by HID covert channel payloads)
+
+
+# ==========================
+# Network and DHCP options for Ethernet over USB
+# ==========================
+
+# We choose an IP with a very small subnet (see comments in README.rst)
+IF_IP="192.168.0.1" # IP used by P4wnP1
+IF_MASK="255.255.255.252" 
+IF_DHCP_RANGE="192.168.0.2,192.168.0.3" # DHCP Server IP Range
+DEFAULT_GATEWAY=true
+
+# ============================
+# Network and DHCP options for WiFi (Pi Zero W with "wlan0" present)
+# ============================
+WIFI_ACCESSPOINT=false
+
+# ============================
+# WiFi Client Settings
+# ============================
+
+WIFI_CLIENT=true 	# enables connecting to existing WiFi (currently only WPA2 PSK)
+WIFI_CLIENT_SSID="network" # name of target network
+WIFI_CLIENT_PSK="super_secret_password" # passphrase for target network
+
+function onNetworkUp()
+{
+	sysctl -w net.ipv4.ip_forward=1
+	iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE 
+	led_blink 255 # set LED to solid on
+}
+
+function onTargetGotIP()
+{
+}
+
+function onBootFinished()
+{
+}
+
+function onLogin()
+{
+}
+
+function onKeyboardUp()
+{
+}
