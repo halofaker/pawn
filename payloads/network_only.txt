@@ -42,7 +42,7 @@ ROUTE_SPOOF=false
 WIFI_ACCESSPOINT=true # enable wifi access point, P4wnP1 will be reachable via IP configured in setup.cfg (WIFI_ACCESSPOINT_IP)
 # Note that any 'WIFI_' settings found in setup.cfg can be overridden for this payload by placing them here.
 
-BLUETOOTH_NAP=true # enable bluetooth NAP, P4wnP1 will be rechable via IP configured in setup.cfg (BLUETOOTH_NAP_IP)
+BLUETOOTH_NAP=true # enable bluetooth NAP, P4wnP1 will be reachable via IP configured in setup.cfg (BLUETOOTH_NAP_IP)
 
 
 # The AutoSSH section enables a SSH reachback to a custom external SSH server
