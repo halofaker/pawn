@@ -39,13 +39,8 @@ USE_UMS=false           # if true USB Mass Storage will be enabled
 ROUTE_SPOOF=false
 
 
-WIFI_ACCESSPOINT=true
-WIFI_ACCESSPOINT_NAME="P4wnP1"
-WIFI_ACCESSPOINT_PSK="MaMe82-P4wnP1"
-WIFI_ACCESSPOINT_IP="172.24.0.1" # IP used by P4wnP1
-WIFI_ACCESSPOINT_NETMASK="255.255.255.0"
-WIFI_ACCESSPOINT_DHCP_RANGE="172.24.0.2,172.24.0.100" # DHCP Server IP Range
-WIFI_ACCESSPOINT_HIDE_SSID=false # don't hide ESSID 
+WIFI_ACCESSPOINT=true # enable wifi access point, P4wnP1 will be reachable via IP configured in setup.cfg (WIFI_ACCESSPOINT_IP)
+# Note that any 'WIFI_' settings found in setup.cfg can be overridden for this payload by placing them here.
 
 BLUETOOTH_NAP=true # enable bluetooth NAP, P4wnP1 will be rechable via IP configured in setup.cfg (BLUETOOTH_NAP_IP)
 
