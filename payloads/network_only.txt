@@ -1,6 +1,6 @@
 #    This file is part of P4wnP1.
 #
-#    Copyright (c) 2017, Marcus Mengs. 
+#    Copyright (c) 2017, Marcus Mengs.
 #
 #    P4wnP1 is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -39,13 +39,8 @@ USE_UMS=false           # if true USB Mass Storage will be enabled
 ROUTE_SPOOF=false
 
 
-WIFI_ACCESSPOINT=true
-WIFI_ACCESSPOINT_NAME="P4wnP1"
-WIFI_ACCESSPOINT_PSK="MaMe82-P4wnP1"
-WIFI_ACCESSPOINT_IP="172.24.0.1" # IP used by P4wnP1
-WIFI_ACCESSPOINT_NETMASK="255.255.255.0"
-WIFI_ACCESSPOINT_DHCP_RANGE="172.24.0.2,172.24.0.100" # DHCP Server IP Range
-WIFI_ACCESSPOINT_HIDE_SSID=false # don't hide ESSID 
+WIFI_ACCESSPOINT=true # enable wifi access point, P4wnP1 will be reachable via IP configured in setup.cfg (WIFI_ACCESSPOINT_IP)
+# Note that any 'WIFI_' settings found in setup.cfg can be overridden for this payload by placing them here.
 
 BLUETOOTH_NAP=true # enable bluetooth NAP, P4wnP1 will be rechable via IP configured in setup.cfg (BLUETOOTH_NAP_IP)
 
@@ -54,7 +49,7 @@ BLUETOOTH_NAP=true # enable bluetooth NAP, P4wnP1 will be rechable via IP config
 # working like this:
 #   1) the target server is defined by AUTOSSH_REMOTE_HOST, the user by
 #      AUTOSSH_REMOTE_USER
-#   2) P4wnP1 continuously attempts to login to this SSH server, using the 
+#   2) P4wnP1 continuously attempts to login to this SSH server, using the
 #      private key provided with AUTOSSH_PRIVATE_KEY
 #   3) In order to allow the login to succeed, the user defined by AUTOSSH_REMOTE_USER
 #      has to have the public key from AUTOSSH_PUBLIC_KEY present in his
@@ -68,7 +63,7 @@ BLUETOOTH_NAP=true # enable bluetooth NAP, P4wnP1 will be rechable via IP config
 #   6) If you login in to the remote SSH server from a different device
 #      you are able to connect back to P4wnP1 using
 #	  ssh -p 8765 pi@localhost
-#      
+#
 #      The port '8765' has to be replaced with the port configured
 #      by AUTOSSH_REMOTE_PORT.
 #
@@ -79,8 +74,8 @@ BLUETOOTH_NAP=true # enable bluetooth NAP, P4wnP1 will be rechable via IP config
 #       `P4wnP1_working_dir/ssh/genkeys.sh
 
 AUTOSSH_ENABLED=true # enable AutoSSH
-AUTOSSH_REMOTE_HOST=YourSSH-server.com 
-AUTOSSH_REMOTE_USER=root 
+AUTOSSH_REMOTE_HOST=YourSSH-server.com
+AUTOSSH_REMOTE_USER=root
 AUTOSSH_PRIVATE_KEY="$wdir/ssh/keys/P4wnP1_id"
-AUTOSSH_PUBLIC_KEY="$wdir/ssh/keys/P4wnP1_id.pub" 
-AUTOSSH_REMOTE_PORT=8765 
+AUTOSSH_PUBLIC_KEY="$wdir/ssh/keys/P4wnP1_id.pub"
+AUTOSSH_REMOTE_PORT=8765
