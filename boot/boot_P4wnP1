@@ -130,7 +130,6 @@ fi
 # change hostname to make P4wnP1 resolveable on "name.local"
 if $WIFI || $USB_ETHERNET; then
 	hostname=$P4WNP1_HOSTNAME # Makes hostname configurable
-
 	hostname $hostname
 	echo $hostname > /etc/hostname
 
