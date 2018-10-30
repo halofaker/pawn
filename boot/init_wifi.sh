@@ -252,7 +252,7 @@ function generate_wpa_supplicant_conf()
 	# if
 	#	WIFI_CLIENT_STORE_NETWORK == false
 	# delete the network entry, to overwrite the old entry in next step (but don't store it later on)
-	
+
 	generate_wpa_entry "$1" "$2" > /tmp/current_wpa.conf
 	sudo bash -c 'cat /tmp/current_wpa.conf >> /tmp/wpa_supplicant.conf'
 
