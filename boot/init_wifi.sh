@@ -215,25 +215,6 @@ function generate_wpa_entry()
 	res=$(wpa_passphrase "$1" "$2") && echo "$res" | grep -v -e "#psk"
 }
 
-function generate_wpa_enterprise_entry()
-{
-
-	#wpa_passphrase $1 $2 | grep -v -e "#psk"
-	# output result only if valid password was used (8..63 characters)
-	echo "network={
-    	ssid=\"$1\"
-		scan_ssid=1
-    	key_mgmt=WPA-EAP
-    	group=CCMP TKIP
-    	eap=PEAP
-    	identity=\"$2\"
-    	password=\"$3\"
-    	phase1=\"peapver=0\"
-    	phase2=\"MSCHAPV2\"
-}"
-
-}
-
 function scan_for_essid()
 {
 	# scan for given ESSID, needs root privs (sudo appended to allow running from user pi if needed)
@@ -247,9 +228,6 @@ function scan_for_essid()
 			# check for PSK CCMP
 			if (echo "$scanres" | grep -q -e "CCMP" && echo "$scanres" | grep -q -e "PSK"); then
 				echo "WPA2_PSK" # confirm WPA2 usage
-			# check for WPA2 enterprise
-			elif (echo "$scanres" | grep -q -e "CCMP" && echo "$scanres" | grep -q -e "802.1x"); then
-				echo "WPA2_802"
 			else
 				echo "WPA2 no CCMP PSK"
 			fi
@@ -274,13 +252,8 @@ function generate_wpa_supplicant_conf()
 	# if
 	#	WIFI_CLIENT_STORE_NETWORK == false
 	# delete the network entry, to overwrite the old entry in next step (but don't store it later on)
-	if [ $3 == "WPA_PSK" ]; then
-		generate_wpa_entry "$1" "$2" > /tmp/current_wpa.conf
-		sudo bash -c 'cat /tmp/current_wpa.conf >> /tmp/wpa_supplicant.conf'
-	else
-		generate_wpa_enterprise_entry "$1" "$2" "$3" > /tmp/current_wpa.conf
-		sudo bash -c 'cat /tmp/current_wpa.conf >> /tmp/wpa_supplicant.conf'
-	fi
+	generate_wpa_entry "$1" "$2" > /tmp/current_wpa.conf
+	sudo bash -c 'cat /tmp/current_wpa.conf >> /tmp/wpa_supplicant.conf'
 
 	# ToDo: store the new network back to persistent config
 	# if
@@ -310,16 +283,10 @@ function start_wifi_client()
 		if [ "$res" == "WPA2_PSK" ]; then
 			echo "Network $WIFI_CLIENT_SSID found"
 			echo "... creating config"
-			generate_wpa_supplicant_conf "$WIFI_CLIENT_SSID" "$WIFI_CLIENT_PSK" "$res" # Pass wifi auth type
+			generate_wpa_supplicant_conf "$WIFI_CLIENT_SSID" "$WIFI_CLIENT_PSK"
 			echo "... connecting ..."
 			start_wpa_supplicant
 			return 0
-		elif [ "$res" == "WPA2_802" ]; then
-			echo "Network $WIFI_CLIENT_SSID found"
-			echo "... creating config"
-			generate_wpa_supplicant_conf "$WIFI_CLIENT_SSID" "$WIFI_CLIENT_USERNAME" "$WIFI_CLIENT_PASSWORD" "$res" # Pass wifi credentials instead of PSK
-			echo "... connecting ..."
-			start_wpa_supplicant
 		else
 			echo "Network $WIFI_CLIENT_SSID not found"
 			return 1 # indicate error
