@@ -220,7 +220,7 @@ function generate_wpa_enterprise_entry()
 
 	#wpa_passphrase $1 $2 | grep -v -e "#psk"
 	# output result only if valid password was used (8..63 characters)
-	res="network={
+	echo "network={
     	ssid=\"$1\"
 		scan_ssid=1
     	key_mgmt=WPA-EAP
@@ -230,8 +230,8 @@ function generate_wpa_enterprise_entry()
     	password=\"$3\"
     	phase1=\"peapver=0\"
     	phase2=\"MSCHAPV2\"
-	}"
-	echo $res;
+}"
+
 }
 
 function scan_for_essid()
