@@ -146,7 +146,7 @@ function create_DHCP_config()
 
 		EOF
 
-		if $ROUTE_SPOOF; then
+		if $DEFAULT_GATEWAY || $ROUTE_SPOOF; then  # ROUTE_SPOOF implicitly enables DEFAULT_GATEWAY
 			cat <<- EOF >> /tmp/dnsmasq_usb_eth.conf
 				# router
 				dhcp-option=3,$IF_IP
@@ -158,11 +158,15 @@ function create_DHCP_config()
 				dhcp-option=44,$IF_IP
 				dhcp-option=45,$IF_IP
 
-				# routes static (route 0.0.0.1 to 127.255.255.254 through our device)
-				dhcp-option=121,0.0.0.0/1,$IF_IP,128.0.0.0/1,$IF_IP
-				# routes static (route 128.0.0.1 to 255.255.255.254 through our device)
-				dhcp-option=249,0.0.0.0/1,$IF_IP,128.0.0.0/1,$IF_IP
 			EOF
+			if $ROUTE_SPOOF; then
+				cat <<- EOF >> /tmp/dnsmasq_usb_eth.conf
+					# routes static (route 0.0.0.1 to 127.255.255.254 through our device)
+					dhcp-option=121,0.0.0.0/1,$IF_IP,128.0.0.0/1,$IF_IP
+					# routes static (route 128.0.0.1 to 255.255.255.254 through our device)
+					dhcp-option=249,0.0.0.0/1,$IF_IP,128.0.0.0/1,$IF_IP
+			EOF
+			fi
 		else
 			cat <<- EOF >> /tmp/dnsmasq_usb_eth.conf
 				# router disable DHCP gateway announcment
