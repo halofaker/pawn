@@ -586,8 +586,13 @@ Use "help FireStage1" to get more details.
 
 	def do_KillProc(self, line):
 		'''
-	Try to kill the given remote process
-	'''
+================================================================================
+Usage: KillProc <ID>
+
+Try to kill the given remote process
+
+Use GetClientProcs for IDs
+		'''
 		try:
 			proc_id = int(line)
 			self.client_call_kill_proc(proc_id)
@@ -598,8 +603,11 @@ Use "help FireStage1" to get more details.
 
 	def do_KillClient(self, line):
 		'''
-	Try to kill the remote client
-	'''
+================================================================================
+Usage: KillClient
+
+Try to kill the remote client
+		'''
 
 		if not self.client.isConnected():
 			print "This doesn't make sense, there's no client connected"
@@ -609,8 +617,11 @@ Use "help FireStage1" to get more details.
 
 	def do_CreateProc(self, line):
 		'''
-		This remote Powershell method calls "core_create_proc" in order to create a remote process
-		The response is handled by "handler_client_core_create_proc()"
+================================================================================
+Usage: CreateProc
+
+This remote Powershell method calls "core_create_proc" in order to create a 
+remote process. The response is handled by "handler_client_core_create_proc()".
 		'''
 
 		if not self.client.isConnected():
@@ -627,7 +638,10 @@ Use "help FireStage1" to get more details.
 
 	def do_GetClientProcs(self, line):
 		'''
-		Print a list of processes managed by the remote client
+================================================================================
+Usage: GetClientProcs
+
+Print a list of processes managed by the remote client
 		'''
 
 		if not self.client.isConnected():
@@ -637,6 +651,21 @@ Use "help FireStage1" to get more details.
 		self.client_call_get_proc_list(waitForResult = True)
 
 	def do_shell(self, line):
+		'''
+================================================================================
+usage: shell <powershell>
+
+Spawns a "cmd.exe" process on the target and starts interaction. 
+Appending powershell to the command, starts a powershell process instead.
+
+STDOUT and STDIN of the remote process are piped through the HID device 
+(covert communication channel).
+
+The Default is to use cmd.exe, as binding to STDOUT and STDIN of a PowerShell
+console host could fail (depending on the target's Windows Version). In case 
+binding fails, the OUTPUT doesn't get transmitted over the HID device. For this
+reason cmd.exe should be used in favor.
+		'''
 		if not self.client.isConnected():
 			print "Not possible... Run 'FireStage1' first, to get the target connected"
 			return
@@ -657,66 +686,64 @@ Use "help FireStage1" to get more details.
 		
 	def do_SendKeys(self, line):
 		'''
-	Prints out everything on target through HID keyboard. Be sure
-	to set the correct keyboard language for your target  (use 
-	'GetKeyboardLanguage' and 'SetKeyboardLanguage' commands.).
-	'''
+================================================================================
+Usage: SendKeys <string>
+
+Prints out <string> on target through HID keyboard.
+
+Be sure to set the correct keyboard language for your target
+(use 'GetKeyboardLanguage' and 'SetKeyboardLanguage' commands)
+		'''
 		self.duckencoder.outhidStringDirect(line)
 	
 	def do_FireStage1(self, line):
 		'''
-	usage: FireStage1 <trigger_type> <trigger_delay in milliseconds> [nohide] [uac]
+================================================================================
+usage: FireStage1 <trigger_type> <trigger_delay in milliseconds> [nohide] [uac]
+
+Fires stage 1 via HID keyboard against a PowerShell process on a Windows client.
+The code downloads stage 2 and after successfull execution commands like "shell"
+could be used, to get a remote shell (communictaing through HID covert channel
+only).
+
+THE KEYBOARD LANGUAGE HAS TO BE SET ACCORDING TO THE TARGETS KEYBOARD LAYOUT, TO
+MAKE THIS WORK (use 'GetKeyboardLanguage' and 'SetKeyboardLanguage' commands.)
 	
-	Fires stage 1 via HID keyboard against a PowerShell process
-	on a Windows client.
-	The code downloads stage 2 and after successfull execution 
-	commands like "shell" could be used, to get a remote shell 
-	(communictaing through HID covert channel only).
 	
-	THE KEYBOARD LANGUAGE HAS TO BE SET ACCORDING TO THE TARGETS 
-	KEYBOARD LAYOUT, TO MAKE THIS WORK (use 'GetKeyboardLanguage' 
-	and 'SetKeyboardLanguage' commands.)
-	
-	
-	trigger_type = 1 (default):
-	  Is faster, because less keys have to be printed out. As the
-	  PowerShell script isn't capable of reading serial and 
-	  manufacturer of a USB HID composite device, PID  and VID have 
-	  to be prepended in front of the payload. This leaves a larger 
-	  footprint.
+trigger_type = 1 (default):
+  Is faster, because less keys have to be printed out. As the PowerShell script
+  isn't capable of reading serial and manufacturer of a USB HID composite
+  device, PID  and VID have to be prepended in front of the payload. This leaves
+  a larger footprint.
+
+trigger_type = 2:
+  Is slower, because around 6000 chars have to be printed to build the needed
+  assembly. There's no need to account on PID and VID, as the code is using the
+  device serial "deadbeefdeadbeef" and the manufacturer "MaMe82". These are
+  hardcodedin the assembly, and leave a smaller footprint (not ad-hoc readable,
+  if powershell script content is logged).
+
+trigger_delay (default 1000):
+  The payload is started by running powershell.exe and directly entering the
+  script with HID keyboard. This part is critical, as if keystrokes get lost the
+  initial stage won't execute. This could be caused by user interaction during
+  stage 1 typeout or due to PowerShell.exe starting too slow and thus getting
+  ready for keyboard input too late. The latter case could be handled by
+  increasing the trigger delay, to give the target host more time between start
+  of powershell and start of typing out stage1. The value defaults to 1000 ms
+  if omitted.
 	  
-	trigger_type = 2:
-	  Is slower, because around 6000 chars have to be printed to 
-	  build the needed assembly. There's no need to account on PID 
-	  and VID, as the code is using the device serial "deadbeef
-	  deadbeef" and the manufacturer "MaMe82". These are hardcoded
-	  in the assembly, and leave a smaller footprint (not ad-hoc 
-	  readable, if powershell script content is logged).
-	  
-	trigger_delay (default 1000):
-	  The payload is started by running powershell.exe and directly
-	  entering the script with HID keyboard.
-	  This part is critical, as if keystrokes get lost the initial
-	  stage won't execute. This could be caused by user interaction
-	  during stage 1 typeout or due to PowerShell.exe starting too
-	  slow and thus getting ready for keyboard input too late. 
-	  The latter case could be handled by increasing the trigger delay,
-	  to give the target host more time between start of powershell
-	  nd start of typing out stage1.
-	  The value defaults to 1000 ms if omitted.
-	  
-	nohide
-	  If "nohide" is added, the stup hiding the powershell window on
-	  the target is omited
-	  
-	uac
-	  If "uac" is added P4wnP1 tries to run an elevated PowerShell
-	  session homing the payload.
-	  
-	  Caution: The target user has to be member of the "Local
-	  Administrators" group, otherwise this would fail.
-	  The option is disabled by default.
-	  '''
+nohide
+  If "nohide" is added, the stup hiding the powershell window on the target is
+  omited
+
+uac
+  If "uac" is added P4wnP1 tries to run an elevated PowerShell session homing
+  the payload.
+
+  Caution: The target user has to be member of the "Local Administrators" group,
+  otherwise this would fail. The option is disabled by default.
+		'''
 		
 		arg_error="Wrong arguments given"
 		trigger_type = 1
@@ -749,10 +776,30 @@ Use "help FireStage1" to get more details.
 		
 	def do_SetKeyboardLanguage(self, line):
 		'''
-	Sets the language for target keyboard interaction.
-	Possible values: 
-	  be, br, ca, ch, de, dk, es, fi, fr, gb, hr, it,
-	  no, pt, ru, si, sv, tr, us
+================================================================================
+usage: SetKeyboardLanguage <language abbreviation>
+
+Sets the language for target keyboard interaction.
+Possible values: 
+	be	Byelorussian
+	br	Breton
+	ca	Catalan
+	ch	Confederation of Helvetia (Switzerland)
+	de	DEutsch (German)
+	dk			IDK
+	es	Spanish
+	fi	Finnish
+	fr	French
+	gb	English (Great Brittan)
+	hr	Croatian
+	it	Italian
+	no	Norwegian
+	pt	Portuguese
+	ru	Russian
+	si	Singhalese
+	sv	Swedish
+	tr	Turkish
+	us	English (United States)
 	'''
 		singleprint = False
 		if len(line) > 0:
@@ -824,11 +871,25 @@ Use "help FireStage1" to get more details.
 		
 	def do_GetKeyboardLanguage(self, line):
 		'''
-	Shows which language is set for HID keyboard.
-	'''
+================================================================================
+usage: GetKeyboardLanguage
+
+Shows which language is set for HID keyboard.
+		'''
 		print self.duckencoder.getLanguage()
 
 	def do_interact(self, line):
+		'''
+================================================================================
+Usage: Interact <process ID>
+
+Interact with <process ID> on the target
+
+Interaction is only possible with processes created by P4wnP1
+(using CreateProc or shell).
+
+Use GetClientProcs for target process IDs
+		'''
 		if not self.client.isConnected():
 			print "Not possible, client not connected"
 			return
@@ -853,16 +914,47 @@ Use "help FireStage1" to get more details.
 		self.interactWithClientProcess(pid)
 			
 	def do_exit(self, line):
+		'''
+================================================================================
+Usage: exit
+
+Exits the Backdoor payload back to the P4wnP1's command-line
+
+The Server is running in a screen session. In order to get access to the command
+line, the screen can be detached using:
+	<CTRL+A> followed by <D>
+
+To interact with the backdoor again, use:
+	<sudo Screen -d -r> could be used 
+(happens on SSH Login automatically)
+
+The problem is, that this behavior isn't part of the backdoor server itself, but
+caused by the surrounding payload script, which starts P4wnP1.py in a separate
+screen session.
+		'''
 		print "Exitting..."
 		# self.ll.stop() # should happen in global finally statement
 		sys.exit()
 
 	def do_state(self, line):
+		'''
+================================================================================
+Usage: state
+
+Shows state of the connection through HID device and some details about the 
+target computer
+
+***At least at the Moment, the code to fill the client Information (PowerShell
+Version, target OS) has been removed right now.***
+		'''
 		self.client.print_state()
 	def do_echotest(self, line):
 		'''
-	If the client is connected, command arguments given should be reflected back.
-	Communications happen through a pure HID covert channel.
+================================================================================
+Usage: echotest <args>
+
+If the client is connected, command arguments given should be reflected back.
+Communications happen through a pure HID covert channel.
 	'''
 		
 		self.client_call_echo(line)
@@ -886,6 +978,16 @@ Use "help FireStage1" to get more details.
 			print "You have to provide a new timeout value in milliseconds"
 	
 	def do_SendDuckyScript(self, line):
+		'''
+================================================================================
+Usage: SendDuckyScript <script>
+
+Deploys a Ducky script saved in P4wnP1/Duckyscrips/
+
+Language of P4wnP1 must match that of the target. For this, use:
+<GetKeyboardLanguage>
+<SetKeyboardLanguage>
+		'''
 		scriptpath = self.config["PATH_DUCKYSCRIPT"] +  "/" +  line
 		
 		if not FileSystem.fileExists(scriptpath):
@@ -936,6 +1038,14 @@ Use "help FireStage1" to get more details.
 		self.duckencoder.outhidDuckyScript(script)
 
 	def do_SendMouseScript(self, line):
+		'''
+================================================================================
+Usage: SendMouseScript <script>
+
+Deploys a Mouse script saved in P4wnP1/Mousescrips/
+
+Similar to SendDuckyScript, except actuates the mouse rather than the keyboard.
+		'''
 		scriptpath = self.config["PATH_MOUSESCRIPT"] +  "/" +  line
 		
 		if not FileSystem.fileExists(scriptpath):
@@ -993,12 +1103,30 @@ Use "help FireStage1" to get more details.
 		print "... finished"
 		
 	def do_lcd(self,  line):
+		'''
+================================================================================
+Usage: lcd
+
+Change directory on the P4wnP1
+		'''
 		print FileSystem.cd(line)
 		
 	def do_lpwd(self,  line):
+		'''
+================================================================================
+Usage: lpwd
+
+Print the name of the Pi's current directory
+		'''
 		print FileSystem.pwd()
 		
 	def do_lls(self,  line):
+		'''
+================================================================================
+Usage: lls
+
+Print the contents of the Pi's current directory
+		'''
 		if len(line.strip()) >  0:
 			res = FileSystem.ls_native2(line.split(" "))
 		else:
@@ -1041,12 +1169,30 @@ Use "help FireStage1" to get more details.
 
 	
 	def do_pwd(self, line):
+		'''
+================================================================================
+Usage: pwd
+
+Print the target's current directory
+		'''
 		self.client_call_FS_command("pwd")
 		
 	def do_ls(self, line):
+		'''
+================================================================================
+Usage: ls
+
+List contents of the target's current directory
+		'''
 		self.client_call_FS_command("ls", line)
 		
 	def do_cd(self, line):
+		'''
+================================================================================
+Usage: cd
+
+Change the target's current directory
+		'''
 		self.client_call_FS_command("cd", line)			
 
 	@staticmethod
@@ -1072,6 +1218,19 @@ Use "help FireStage1" to get more details.
 		
 	
 	def do_upload(self, line):
+		'''
+================================================================================
+Usage: upload <Pi/directory.filetype> <target/directory.filetype>
+
+Upload a file from the Pi to the target
+
+<Pi/directory.filetype> is mandatory
+<target/directory.filetype> is optional
+
+If target filename is omitted, the source filename is used.
+If path is omitted, the current working directory is used
+	(on both P4wnP1 and remote host)
+		'''
 		args = line.split(" ")
 		target_path = ""
 		source_path = ""
@@ -1191,6 +1350,19 @@ Use "help FireStage1" to get more details.
 		print
 		
 	def do_download(self, line):
+		'''
+================================================================================
+Usage: download <target/directory.filetype> <Pi/directory.filetype>
+
+Download a file from the Pi to the target
+
+<target/directory.filetype> is mandatory
+<Pi/directory.filetype> is optional
+
+If target filename is omitted, the source filename is used.
+If path is omitted, the current working directory is used
+	(on both P4wnP1 and remote host)
+		'''
 		args = line.split(" ")
 		target_path = ""
 		source_path = ""
