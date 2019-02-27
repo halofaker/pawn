@@ -37,7 +37,7 @@ I'm doing this on Kali Linux, most other distros should be fine, too (I'm workin
 
 So this should bring up a new network interface on your box, which in my case is called `usb0` and has to be enabled with `ifconfig usb0 up`. The problem is, that the Pi runs a DHCP client on títs internal interface, waiting to receive a DHCP lease with an IP to use. As this lease will never be sent (as long as you haven't configured a DHCP server on usb0). We don't know the IP of the Pi. You could attach an HDMI monitor and the Pi will print out the IP used. But as promised, we do it in my way and that is headless.
 Now that the Pi isn't able too receive a DHCP lease, it chooses its own IP with a process called APIPA. I don't want to explain everything here, but one part of APIPA is important: Before the Pi chooses its IP, it has to check if any other host is using it already. This is done via ARP request. So if we sniff on our `usb0` interface, shortly after bringing it up, we should see an ARP request. To fecth this request, I personally use tshark, but every other sniffer should be fine, as long as you bring it up fast enough. So instead of running only `ifconfig usb0 up` we do the following.
-`ifconfig usb0 up && thshark -i usb0`
+`ifconfig usb0 up && tshark -i usb0`
 
 8. Watch the tshark output, till you see an ARP request with an IP (who has 169.254.241.194 in my case)
 9. Stop tshark with `CTRL + C` and grab a copy of the IP.
