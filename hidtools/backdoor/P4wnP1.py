@@ -669,9 +669,9 @@ Use "help FireStage1" to get more details.
 	
 	Fires stage 1 via HID keyboard against a PowerShell process
 	on a Windows client.
-	The code downloads stage 2 and after successfull execution 
+	The code downloads stage 2 and after successful execution 
 	commands like "shell" could be used, to get a remote shell 
-	(communictaing through HID covert channel only).
+	(communicating through HID covert channel only).
 	
 	THE KEYBOARD LANGUAGE HAS TO BE SET ACCORDING TO THE TARGETS 
 	KEYBOARD LAYOUT, TO MAKE THIS WORK (use 'GetKeyboardLanguage' 
@@ -706,8 +706,8 @@ Use "help FireStage1" to get more details.
 	  The value defaults to 1000 ms if omitted.
 	  
 	nohide
-	  If "nohide" is added, the stup hiding the powershell window on
-	  the target is omited
+	  If "nohide" is added, the setup hiding the powershell window on
+	  the target is omitted
 	  
 	uac
 	  If "uac" is added P4wnP1 tries to run an elevated PowerShell
